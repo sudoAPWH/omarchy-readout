@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "id": "omarchy-stats",
+  "name": "System monitor",
+  "version": "1.0.0",
+  "author": "Alexander Hutlet",
+  "description": "CPU, GPU, memory, disk and network telemetry with an essentials popup and a btop-style detail window",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "Panel.qml"
+  },
+  "barWidget": {
+    "displayName": "System monitor",
+    "description": "CPU, GPU, memory, disk and network telemetry with an essentials popup and a btop-style detail window",
+    "category": "System",
+    "allowMultiple": false,
+    "defaultSection": "right",
+    "defaults": {
+      "interval": 2,
+      "openInterval": 1,
+      "terminalCommand": "omarchy-launch-or-focus-tui btop",
+      "processCount": 7
+    },
+    "schema": [
+      {
+        "key": "interval",
+        "type": "number",
+        "label": "Sample interval (seconds)"
+      },
+      {
+        "key": "processCount",
+        "type": "number",
+        "label": "Processes listed in the panel"
+      },
+      {
+        "key": "openInterval",
+        "type": "number",
+        "label": "Sample interval while open (seconds)"
+      },
+      {
+        "key": "terminalCommand",
+        "type": "string",
+        "label": "Command for the full monitor button"
+      }
+    ]
+  },
+  "license": "MIT"
+}
