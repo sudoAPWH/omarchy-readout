@@ -72,41 +72,33 @@ Settings live inline on the widget's entry in `~/.config/omarchy/shell.json`:
 
 ## Development
 
-Omarchy loads plugins from `~/.config/omarchy/plugins/<id>/`, so a checkout
-kept anywhere else needs that path to point at it:
+Omarchy loads plugins from `~/.config/omarchy/plugins/<id>/`. To work from a
+checkout elsewhere, point that path at it:
 
 ```bash
 ln -s ~/Projects/omarchy-stats ~/.config/omarchy/plugins/omarchy-stats
-omarchy restart shell
 ```
 
-Two caveats, both learned the hard way:
+Apply changes with `omarchy restart shell`. Hot-reload does not fire for a
+symlinked plugin directory, and `rescanPlugins` can re-run the previous build
+of a QML file.
 
-- **Symlinked plugin directories do not hot-reload.** Omarchy reloads plugin
-  code when a file under `~/.config/omarchy/plugins/` changes, but the watcher
-  does not traverse a symlink — editing through either path triggers nothing.
-  Apply changes with `omarchy restart shell`.
-- **`omarchy-shell shell rescanPlugins` can serve a stale compile.** Even on a
-  real directory it has been observed re-running the previous build of a QML
-  file. `omarchy restart shell` is the reliable way to apply a change.
-
-Validate the manifest and typecheck the QML before restarting:
+Check the manifest and the QML before restarting:
 
 ```bash
 omarchy plugin validate .
 qmllint -I /usr/share/omarchy/shell -I . Panel.qml
 ```
 
-`qmllint` will not catch a call to an undefined QML function — those resolve
-at runtime — so exercise both surfaces after a change:
+Neither catches a call to an undefined QML function, so exercise both surfaces
+after a change:
 
 ```bash
 omarchy-shell omarchy-stats open            # essentials popup
 omarchy-shell omarchy-stats.detail open     # detail window
 ```
 
-The collector runs standalone, which is the fastest way to check a metric
-without involving the shell at all:
+The collector runs standalone, without the shell:
 
 ```bash
 { printf 'mode full\n'; sleep 3; } | ./bin/sysmon-collect | tail -1 | python3 -m json.tool
@@ -152,25 +144,6 @@ needs perf access that `perf_event_paranoid=2` denies, so instead the load is
 taken from the RC6 (render idle) residency counter: whatever fraction of wall
 time the render engine was *not* parked in RC6 is time it was working. It
 tracks `intel_gpu_top` closely and needs no privileges.
-
-## Layout notes
-
-A few things in here are load-bearing and easy to undo by accident:
-
-- Component properties are named `leading`/`trailing`, not `left`/`right` —
-  `Item` reserves those for its FINAL anchor lines and QML refuses to load.
-- The collector reads its raw stdin fd rather than `readline()`. A buffered
-  read pulls every queued command into Python's own buffer and returns only
-  the first, leaving the rest invisible to the next `select()` — so a burst
-  like `interval 1\nmode full\n` would apply its second line only when some
-  later command happened to wake the loop.
-- Tooltip rows are padded to a common width with U+00A0. Omarchy's shared
-  tooltip centers each line, and Qt discards trailing ASCII whitespace when it
-  measures a line for alignment, so ordinary padding leaves the table
-  staggered.
-- Bar percentages are gone in favour of one fixed-width glyph. A readout that
-  resizes as values cross 9% and 99% reflows the widgets beside it and drags
-  the popup anchored beneath it back and forth.
 
 ## License
 
