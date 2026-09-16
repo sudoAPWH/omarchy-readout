@@ -96,6 +96,10 @@ Panel {
   }
 
   function applySample(line) {
+    // Our own collector's samples are a few KB. Anything wildly past that is
+    // not a sample, and is not worth handing to the parser.
+    if (!line || line.length > 1048576) return
+
     var parsed
     try {
       parsed = JSON.parse(line)
@@ -126,11 +130,15 @@ Panel {
 
   Process {
     id: collector
-    command: [root.collectorPath]
+    // Named interpreter rather than the script's shebang, so nothing is looked
+    // up on $PATH. -I ignores PYTHONPATH and the user site directory, -S skips
+    // site imports; the collector is stdlib-only.
+    command: ["/usr/bin/python3", "-I", "-S", root.collectorPath]
     running: true
     stdinEnabled: true
 
     onStarted: {
+      root.collectorStartedAt = Date.now()
       root.send("procs " + root.processCount)
       root.send("interval " + root.desiredInterval)
       root.send("mode " + root.desiredMode)
@@ -139,7 +147,19 @@ Panel {
     // The shell outlives any single collector; if python dies (an update
     // swapping the interpreter, an OOM kill) bring it straight back rather
     // than leaving the widget frozen on its last sample for the session.
-    onExited: restartTimer.restart()
+    //
+    // A collector that dies immediately, every time, is a different thing: the
+    // interpreter is missing, or the script cannot run here. Backing off turns
+    // that from a process spawned every three seconds for the rest of the
+    // session into a handful of attempts and a message.
+    onExited: {
+      var ranLong = Date.now() - root.collectorStartedAt > 30000
+      root.collectorFailures = ranLong ? 0 : root.collectorFailures + 1
+      if (root.collectorFailures <= root.maxCollectorRetries) {
+        restartTimer.interval = Math.min(60000, 3000 * Math.pow(2, Math.max(0, root.collectorFailures - 1)))
+        restartTimer.restart()
+      }
+    }
 
     stdout: SplitParser {
       onRead: function(line) { root.applySample(line) }
@@ -151,6 +171,14 @@ Panel {
     interval: 3000
     onTriggered: if (!collector.running) collector.running = true
   }
+
+  property double collectorStartedAt: 0
+  property int collectorFailures: 0
+  readonly property int maxCollectorRetries: 5
+
+  // Shown in place of the readings once the collector has stopped coming back,
+  // rather than leaving the panel on a frozen last sample with no explanation.
+  readonly property bool collectorLost: collectorFailures > maxCollectorRetries
 
   // Driving the collector off derived state rather than off each open/close
   // handler means the two surfaces can hand off to each other — the popout
