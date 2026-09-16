@@ -53,8 +53,23 @@ around the bar with `omarchy bar move io.github.sudoapwh.readout --section right
 
 ## Requirements
 
-Python 3 and a Nerd Font (Omarchy ships both). Nothing here needs root, and
-nothing is installed outside the plugin directory.
+Python 3 and a Nerd Font (Omarchy ships both). The collector runs as
+`/usr/bin/python3 -I -S` and uses only the standard library. `lspci` and
+`nvidia-smi` are used when they are installed, for the GPU name and NVIDIA
+readings, and skipped when they are not.
+
+Everything is read from `/proc` and `/sys`. Nothing here needs root, nothing is
+written outside the plugin directory, and nothing touches the network.
+
+## Removing it
+
+```bash
+omarchy plugin remove io.github.sudoapwh.readout --yes
+```
+
+To take it off the bar but keep it installed, `omarchy plugin disable
+io.github.sudoapwh.readout` instead. Readout keeps no state of its own, so
+removing it leaves nothing behind.
 
 ## Settings
 
