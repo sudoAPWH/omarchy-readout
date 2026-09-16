@@ -1,6 +1,6 @@
-# omarchy-stats
+# omarchy-readout
 
-A system monitor for the [Omarchy](https://omarchy.org/) shell — a Quickshell
+Readout is a system monitor for the [Omarchy](https://omarchy.org/) shell — a Quickshell
 bar widget with two levels of detail behind it.
 
 The bar carries a single chip glyph. Hover it for the three numbers you
@@ -36,19 +36,20 @@ The plugin is the repository, so it installs the way any third-party Omarchy
 plugin does:
 
 ```bash
-omarchy plugin add https://git.hutlet.ca/ahutlet/omarchy-stats.git --enable --yes
+omarchy plugin add https://github.com/sudoAPWH/omarchy-readout.git --enable --yes
 ```
 
 To install a working copy by hand instead:
 
 ```bash
-git clone https://git.hutlet.ca/ahutlet/omarchy-stats.git ~/.config/omarchy/plugins/omarchy-stats
+git clone https://github.com/sudoAPWH/omarchy-readout.git \
+  ~/.config/omarchy/plugins/io.github.sudoapwh.readout
 omarchy-shell shell rescanPlugins
-omarchy plugin enable omarchy-stats
+omarchy plugin enable io.github.sudoapwh.readout
 ```
 
 The directory name must match the `id` in `manifest.json`. Move the widget
-around the bar with `omarchy bar move omarchy-stats --section right`.
+around the bar with `omarchy bar move io.github.sudoapwh.readout --section right`.
 
 ## Requirements
 
@@ -60,7 +61,7 @@ nothing is installed outside the plugin directory.
 Settings live inline on the widget's entry in `~/.config/omarchy/shell.json`:
 
 ```json
-{ "id": "omarchy-stats", "openInterval": 0.5, "processCount": 12 }
+{ "id": "io.github.sudoapwh.readout", "openInterval": 0.5, "processCount": 12 }
 ```
 
 | Key | Default | Meaning |
@@ -76,7 +77,7 @@ Omarchy loads plugins from `~/.config/omarchy/plugins/<id>/`. To work from a
 checkout elsewhere, point that path at it:
 
 ```bash
-ln -s ~/Projects/omarchy-stats ~/.config/omarchy/plugins/omarchy-stats
+ln -s ~/Projects/stats ~/.config/omarchy/plugins/io.github.sudoapwh.readout
 ```
 
 Apply changes with `omarchy restart shell`. Hot-reload does not fire for a
@@ -94,8 +95,8 @@ Neither catches a call to an undefined QML function, so exercise both surfaces
 after a change:
 
 ```bash
-omarchy-shell omarchy-stats open            # essentials popup
-omarchy-shell omarchy-stats.detail open     # detail window
+omarchy-shell omarchy-readout open            # essentials popup
+omarchy-shell omarchy-readout.detail open     # detail window
 ```
 
 The collector runs standalone, without the shell:

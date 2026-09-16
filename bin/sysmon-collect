@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Streaming system telemetry for the omarchy-stats Omarchy shell plugin.
+"""Streaming system telemetry for the Readout Omarchy shell plugin.
 
 Emits one JSON object per line on stdout. The shell keeps a single instance
 alive for the whole session and steers it over stdin:

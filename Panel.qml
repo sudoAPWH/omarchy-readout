@@ -20,8 +20,8 @@ import "Model.js" as Model
 Panel {
   id: root
 
-  moduleName: "omarchy-stats"
-  ipcTarget: "omarchy-stats"
+  moduleName: "io.github.sudoapwh.readout"
+  ipcTarget: "omarchy-readout"
 
   // ------------------------------------------------------------- settings
   readonly property real idleInterval: Math.max(0.5, Number(setting("interval", 2)) || 2)
@@ -171,7 +171,7 @@ Panel {
   }
 
   IpcHandler {
-    target: "omarchy-stats.detail"
+    target: "omarchy-readout.detail"
 
     function open(): void { root.showDetail() }
     function close(): void { root.hideDetail() }

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "id": "omarchy-stats",
-  "name": "System monitor",
+  "id": "io.github.sudoapwh.readout",
+  "name": "Readout",
   "version": "1.0.0",
   "author": "Alexander Hutlet",
   "description": "CPU, GPU, memory, disk and network telemetry with an essentials popup and a btop-style detail window",
@@ -12,7 +12,7 @@
     "barWidget": "Panel.qml"
   },
   "barWidget": {
-    "displayName": "System monitor",
+    "displayName": "Readout",
     "description": "CPU, GPU, memory, disk and network telemetry with an essentials popup and a btop-style detail window",
     "category": "System",
     "allowMultiple": false,
