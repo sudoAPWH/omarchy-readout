@@ -176,8 +176,9 @@ Panel {
   property int collectorFailures: 0
   readonly property int maxCollectorRetries: 5
 
-  // Shown in place of the readings once the collector has stopped coming back,
-  // rather than leaving the panel on a frozen last sample with no explanation.
+  // Surfaced in the panel footer and the bar tooltip once the collector has
+  // stopped coming back, rather than leaving both on a frozen last sample with
+  // no explanation.
   readonly property bool collectorLost: collectorFailures > maxCollectorRetries
 
   // Driving the collector off derived state rather than off each open/close
@@ -214,7 +215,8 @@ Panel {
   // One resource per row, aligned in the bar's monospace face, so the tooltip
   // is read down a column instead of parsed across a line.
   readonly property string barTooltip: {
-    if (!primed) return "System monitor"
+    if (collectorLost) return "Readout — the collector stopped"
+    if (!primed) return "Readout — waiting for the first sample"
 
     function row(label, reading, detail) {
       return Model.padRight(label, 5) + Model.padLeft(reading, 5) + "   " + detail
@@ -873,9 +875,11 @@ Panel {
           Text {
             width: parent.width
             textFormat: Text.PlainText
-            text: root.primed
-              ? "sampling every " + root.openInterval + "s  ·  esc to close"
-              : "waiting for first sample…"
+            text: root.collectorLost
+              ? "the collector stopped; restart the shell to try again"
+              : root.primed
+                ? "sampling every " + root.openInterval + "s  ·  esc to close"
+                : "waiting for first sample…"
             color: root.dim(0.45)
             font.family: root.face
             font.pixelSize: Style.font.caption
